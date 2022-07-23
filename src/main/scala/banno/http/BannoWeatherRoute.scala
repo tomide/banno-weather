@@ -6,28 +6,26 @@ import cats.effect.{Clock, Sync}
 import cats.implicits._
 import io.chrisdavenport.log4cats.Logger
 import org.http4s.HttpRoutes
-import org.http4s.blaze.http.HttpService
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.dsl.Http4sDsl
 
 class BannoWeatherRoute[F[_]: Sync: Clock: Logger](
                                                 openWeatherSvc: BannoWeatherService[F]
-                                              ) extends HttpService
-  with Http4sDsl[F] {
+                                              ) extends Http4sDsl[F] {
 
-//  implicit val metricsDecoder: QueryParamDecoder[Option[NonEmptyList[Metrics]]] = {
-//    QueryParamDecoder[String].map(x => MetricsPathMatcher.unapply(x))
-//  }
-  private object Metrics extends OptionalQueryParamDecoderMatcher[String]("metrics")
+  private object WeatherUnit extends OptionalQueryParamDecoderMatcher[String]("unit")
 
-  override def httpService: HttpRoutes[F] = {
+    def apply: HttpRoutes[F] = {
+
+
     val routes                       = HttpRoutes.of[F] {
-      case req @ GET -> Root / "banno" / "weather" :? Metrics(metrics)      =>
+      case req @ GET -> Root / "banno" / "weather" :? WeatherUnit(unit)      =>
         for {
           coordinate <- req.as[Coordinate]
-          unitMetric = MetricsPathMatcher.unapply(metrics.getOrElse("standard"))
-          response <- openWeatherSvc.retrieveWeatherData(coordinate, metrics.getOrElse("standard"))
+          unitMetric <- Sync[F].fromOption(UnitPathMatcher.unapply(unit.getOrElse("standard")), new RuntimeException("weather unit could not be determined"))
+          response <- openWeatherSvc.retrieveWeatherData(coordinate, unitMetric)
         } yield response
     }
+    routes
   }
 }
