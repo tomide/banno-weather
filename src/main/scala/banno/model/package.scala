@@ -8,7 +8,7 @@ import io.circe.{Codec, Decoder, Encoder}
 
 package object model {
 
-  case class Coordinate(longitude: Long, latitude: Long)
+  case class Coordinate(latitude: Float,longitude: Float)
 
   sealed trait WeatherUnit extends EnumEntry with Lowercase {
     val value: String
@@ -34,24 +34,24 @@ package object model {
     def parse(value: String): Option[WeatherUnit] = values.find(_.entryName.equalsIgnoreCase(value))
   }
 
-  object UnitPathMatcher {
+  object WeatherUnitPathMatcher {
 
     def unapply(str: String): Option[WeatherUnit] =
       Metrics.parse(str)
   }
 
   case class TemperatureInfo(main: String)
-  case class CurrentTemperatureInfo(temp: Long, weather: TemperatureInfo)
+  case class CurrentTemperatureInfo(temp: Float, weather: Seq[TemperatureInfo])
   case class WeatherAlert(event: String, start: Long, end: Long)
 
   case class WeatherData(lat: Float, lon: Float,
-                         currently: CurrentTemperatureInfo, alerts: WeatherAlert)
+                         current: CurrentTemperatureInfo, alerts: Option[Seq[WeatherAlert]])
 
-  case class BannoWeatherAppResponse(
-                                      currentWeatherCondition : String,
-                                      feelsLikeOutside: String,
-                                      Alert: Option[WeatherAlert]
-                                    )
+  trait BannoResponse
+  case class BannoWeatherAppResponse(currentWeatherCondition : String,feelsLikeOutside: String,
+                                     alert: Seq[WeatherAlert]) extends BannoResponse
+
+  case class AppError(code: Int, message: String) extends RuntimeException with BannoResponse
 
   implicit val codecConfiguration: Configuration =
     Configuration.default.withSnakeCaseMemberNames.withDefaults
@@ -62,8 +62,8 @@ package object model {
   implicit val currentTemperatureInfoDecoder: Decoder[CurrentTemperatureInfo] =
     deriveConfiguredDecoder
 
-  implicit val weatherAlertDecoder: Decoder[WeatherAlert] =
-    deriveConfiguredDecoder
+  implicit val weatherAlertDecoder: Codec[WeatherAlert] =
+    deriveConfiguredCodec
 
   implicit val weatherDataDecoder: Decoder[WeatherData] =
     deriveConfiguredDecoder
@@ -74,4 +74,6 @@ package object model {
   implicit val bannoWeatherAppResponseEncoder: Encoder[BannoWeatherAppResponse] =
     deriveConfiguredEncoder
 
+  implicit val appErrorResponseEncoder: Encoder[AppError] =
+    deriveConfiguredEncoder
 }

@@ -12,6 +12,11 @@ import java.util.concurrent.TimeUnit
 
 object MiddlewareLogger {
   def apply[F[_]: Sync: Clock: Logger]: HttpMiddleware[F] = {
+
+    implicit class BannoResponseOps(val response: Response[F]) {
+      val toBannoResponse: Response[F] = response
+    }
+
     val logger: String => F[Unit] = (info: String) => {
       Logger[F].info(info)
     }
@@ -24,9 +29,9 @@ object MiddlewareLogger {
           response <- handler.run(request).value
           _        <- response.fold(Sync[F].unit)(responseInfo =>
             for {
-              _     <- message(responseInfo)(logHeaders = false)
+              responseString     <- message(responseInfo)(logHeaders = false)
               time2 <- Clock[F].monotonic(TimeUnit.NANOSECONDS)
-              _     <- logger(s"$requestInfo - $responseInfo - ${TimeUnit.NANOSECONDS.toMillis(time2 - time1)} ms")
+              _     <- logger(s"$requestInfo - $responseString - ${TimeUnit.NANOSECONDS.toMillis(time2 - time1)} ms")
             } yield ()
           )
         } yield response

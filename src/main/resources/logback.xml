@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <variable name="APP_LOG_LEVEL" value="${APP_LOG_LEVEL:-INFO}"/>
+    <variable name="ROOT_LOG_LEVEL" value="${ROOT_LOG_LEVEL:-INFO}"/>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <prettyPrint>false</prettyPrint>
+            </jsonFormatter>
+            <timestampFormat>yyyy-MM-dd' 'HH:mm:ss,SSS</timestampFormat>
+            <appendLineSeparator>true</appendLineSeparator>
+        </layout>
+    </appender>
+
+    <logger name="banno" level="${APP_LOG_LEVEL}"/>
+
+    <root level="${ROOT_LOG_LEVEL}">
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>
