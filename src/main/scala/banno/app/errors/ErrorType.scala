@@ -1,4 +1,4 @@
-package banno.app
+package banno.app.errors
 
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps

@@ -1,11 +1,11 @@
-package banno.app
+package banno.app.errors
 
 import cats.Show
 import cats.data.NonEmptyList
-import io.circe.{Encoder, Json}
-import io.circe.syntax._
 import cats.syntax.show._
 import io.circe.generic.auto.exportEncoder
+import io.circe.syntax._
+import io.circe.{Encoder, Json}
 
 sealed trait ErrorDetails
 

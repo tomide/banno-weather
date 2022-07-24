@@ -1,6 +1,6 @@
 package banno.client
 
-import banno.app.ErrorType.Unexpected
+import banno.app.errors.ErrorType.Unexpected
 import banno.app.OpenWeatherConfig
 import banno.model.{Coordinate, OpenWeatherError, WeatherData, WeatherUnit}
 import cats.effect.Sync

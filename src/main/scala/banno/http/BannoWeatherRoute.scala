@@ -1,7 +1,8 @@
 package banno.http
 
-import banno.app.ErrorType.IllegalInput
-import banno.app.{AppError, OpenWeatherConfig}
+import banno.app.errors.ErrorType.IllegalInput
+import banno.app.OpenWeatherConfig
+import banno.app.errors.AppError
 import banno.model.{Coordinate, _}
 import banno.service.BannoWeatherService
 import cats.effect.{Clock, Sync}

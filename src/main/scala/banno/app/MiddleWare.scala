@@ -1,5 +1,6 @@
 package banno.app
 
+import banno.app.errors.{AppErrorHandler, ErrorTypeToHttpStatus}
 import cats.effect.{Clock, Sync}
 import com.olegpy.meow.hierarchy.deriveMonadErrorFromThrowable
 import io.chrisdavenport.log4cats.Logger

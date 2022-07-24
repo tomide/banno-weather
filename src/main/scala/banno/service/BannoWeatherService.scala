@@ -1,12 +1,13 @@
 package banno.service
 
-import banno.app.AppError
-import banno.app.ErrorType.IllegalInput
+import banno.app.errors.ErrorType.IllegalInput
+import banno.app.errors
+import banno.app.errors.AppError
 import banno.client.OpenWeatherClient
 import banno.model.{
-  OpenWeatherError,
   BannoWeatherAppResponse,
   Coordinate,
+  OpenWeatherError,
   TemperatureInfo,
   WeatherAlert,
   WeatherData,
@@ -29,9 +30,9 @@ object BannoWeatherService {
       for {
         d <- owc.getWeatherInformation(coordinate, weatherUnit)
         c  = d.map(_.toBannoWeatherAppResponse)
-        f  <- c match {
+        f <- c match {
                case Right(v) => v.pure[F]
-               case Left(_)  => Sync[F].raiseError(AppError("testing error", IllegalInput))
+               case Left(_)  => Sync[F].raiseError(errors.AppError("testing error", IllegalInput))
              }
       } yield f
   }
