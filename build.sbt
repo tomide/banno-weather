@@ -41,7 +41,8 @@ lazy val root = (project in file("."))
       "ch.qos.logback.contrib" % "logback-jackson" % logbackJackson,
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonCore,
       "com.beachape" %% "enumeratum" % enumCore,
-      "com.beachape" %% "enumeratum-circe" % enumCore
+      "com.beachape" %% "enumeratum-circe" % enumCore,
+      "com.olegpy" %% "meow-mtl-core" % "0.5.0"
     ),
     addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),

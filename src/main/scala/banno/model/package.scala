@@ -8,7 +8,7 @@ import io.circe.{Codec, Decoder, Encoder}
 
 package object model {
 
-  case class Coordinate(latitude: Float,longitude: Float)
+  case class Coordinate(latitude: Float, longitude: Float)
 
   sealed trait WeatherUnit extends EnumEntry with Lowercase {
     val value: String
@@ -43,15 +43,15 @@ package object model {
   case class TemperatureInfo(main: String)
   case class CurrentTemperatureInfo(temp: Float, weather: Seq[TemperatureInfo])
   case class WeatherAlert(event: String, start: Long, end: Long)
+  case class WeatherData(lat: Float, lon: Float, current: CurrentTemperatureInfo, alerts: Option[Seq[WeatherAlert]])
 
-  case class WeatherData(lat: Float, lon: Float,
-                         current: CurrentTemperatureInfo, alerts: Option[Seq[WeatherAlert]])
+  case class BannoWeatherAppResponse(
+    currentWeatherCondition: String,
+    feelsLikeOutside: String,
+    alert: Seq[WeatherAlert],
+  )
 
-  trait BannoResponse
-  case class BannoWeatherAppResponse(currentWeatherCondition : String,feelsLikeOutside: String,
-                                     alert: Seq[WeatherAlert]) extends BannoResponse
-
-  case class AppError(code: Int, message: String) extends RuntimeException with BannoResponse
+  case class OpenWeatherError(code: Int, message: String)
 
   implicit val codecConfiguration: Configuration =
     Configuration.default.withSnakeCaseMemberNames.withDefaults
@@ -74,6 +74,6 @@ package object model {
   implicit val bannoWeatherAppResponseEncoder: Encoder[BannoWeatherAppResponse] =
     deriveConfiguredEncoder
 
-  implicit val appErrorResponseEncoder: Encoder[AppError] =
+  implicit val openWeatherErrorEncoder: Encoder[OpenWeatherError] =
     deriveConfiguredEncoder
 }

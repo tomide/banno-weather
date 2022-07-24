@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <variable name="APP_LOG_LEVEL" value="${APP_LOG_LEVEL:-INFO}"/>
-    <variable name="ROOT_LOG_LEVEL" value="${ROOT_LOG_LEVEL:-INFO}"/>
+    <variable name="APP_LOG_LEVEL" value="${APP_LOG_LEVEL:-DEBUG}"/>
+    <variable name="ROOT_LOG_LEVEL" value="${ROOT_LOG_LEVEL:-DEBUG}"/>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">

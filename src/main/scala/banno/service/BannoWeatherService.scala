@@ -1,7 +1,18 @@
 package banno.service
 
+import banno.app.AppError
+import banno.app.ErrorType.IllegalInput
 import banno.client.OpenWeatherClient
-import banno.model.{BannoWeatherAppResponse, Coordinate, TemperatureInfo, WeatherAlert, WeatherData, WeatherUnit}
+import banno.model.{
+  OpenWeatherError,
+  BannoWeatherAppResponse,
+  Coordinate,
+  TemperatureInfo,
+  WeatherAlert,
+  WeatherData,
+  WeatherUnit,
+}
+import banno.service.BannoWeatherDataOps.BannoWeatherAppResponseOps
 import cats.effect.Sync
 import cats.implicits._
 import io.chrisdavenport.log4cats.Logger
@@ -11,19 +22,17 @@ trait BannoWeatherService[F[_]] {
 }
 
 object BannoWeatherService {
-  implicit class BannoWeatherAppResponseOps(val data: WeatherData) {
-    private def currentWeatherCondition: String = data.current.weather.headOption.getOrElse(
-      TemperatureInfo("current weather condition is unknown")).main
-    private def feelsLikeOutside: String = "ttt"
-    private def alert: Seq[WeatherAlert] = data.alerts.fold(Seq[WeatherAlert]().empty)(alt => alt)
-   val toBannoWeatherAppResponse = BannoWeatherAppResponse(currentWeatherCondition, feelsLikeOutside, alert)
-  }
+
   class Impl[F[_]: Sync: Logger](owc: OpenWeatherClient[F]) extends BannoWeatherService[F] {
-    override def retrieveWeatherData(coordinate: Coordinate, weatherUnit: WeatherUnit): F[BannoWeatherAppResponse] = {
-      owc.getWeatherInformation(coordinate, weatherUnit).flatMap {
-        case Right(value) => value.toBannoWeatherAppResponse.pure[F]
-        case Left(error) => Sync[F].raiseError(error)
-      }
-    }
+
+    override def retrieveWeatherData(coordinate: Coordinate, weatherUnit: WeatherUnit): F[BannoWeatherAppResponse] =
+      for {
+        d <- owc.getWeatherInformation(coordinate, weatherUnit)
+        c  = d.map(_.toBannoWeatherAppResponse)
+        f  <- c match {
+               case Right(v) => v.pure[F]
+               case Left(_)  => Sync[F].raiseError(AppError("testing error", IllegalInput))
+             }
+      } yield f
   }
 }
