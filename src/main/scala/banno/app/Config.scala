@@ -10,7 +10,7 @@ object Type {
 }
 case class ServerConfig(host: String, port: Int)
 case class BlazeClientConfig(connectionTimeout: Duration, requestTimeout: Duration)
-case class OpenWeatherConfig(apiKey: String, host: Uri, defaultMetric: String, WeatherThreshold: Map[String, Long])
+case class OpenWeatherConfig(apiKey: String, host: Uri, defaultMetric: String, WeatherThreshold: Type.WeatherThreshold)
 
 case class Config(
   openWeatherConfig: OpenWeatherConfig,

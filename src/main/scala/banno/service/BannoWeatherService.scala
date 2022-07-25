@@ -1,8 +1,8 @@
 package banno.service
 
-import banno.app.{OpenWeatherConfig, Type, errors}
-import banno.app.errors.ErrorType.IllegalInput
+import banno.app.OpenWeatherConfig
 import banno.client.OpenWeatherClient
+import banno.client.OpenWeatherOps.OpenWeatherErrorResponseOps
 import banno.model.{BannoWeatherAppResponse, Coordinate, WeatherUnit}
 import banno.service.BannoWeatherDataOps.BannoWeatherAppResponseOps
 import cats.effect.Sync
@@ -23,7 +23,7 @@ object BannoWeatherService {
         c  = d.map(_.toBannoWeatherAppResponse(config.WeatherThreshold))
         f <- c match {
                case Right(v) => v.pure[F]
-               case Left(_)  => Sync[F].raiseError(errors.AppError("testing error", IllegalInput))
+               case Left(e)  => Sync[F].raiseError(e.toAppError)
              }
       } yield f
     }
