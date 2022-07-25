@@ -22,7 +22,7 @@ class Fixture(filePath: String) {
 
   def asRenderedTemplate(values: Map[String, String]): String =
     values.foldLeft(raw) { case (file, (k, v)) =>
-      file.replaceAll(s"{{ $k }}", v)
+      file.replaceAll("{{ " + k + " }}", v)
     }
 
   private def readFile(filePath: String): String = {
