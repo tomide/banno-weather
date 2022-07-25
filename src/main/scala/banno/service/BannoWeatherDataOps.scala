@@ -18,8 +18,8 @@ object BannoWeatherDataOps {
     def toBannoWeatherAppResponse(threshold: Type.WeatherThreshold): BannoWeatherAppResponse = {
 
       /**
-       * the feelsLikeOutside method below is a static implementation assuming all units have the same time range.
-       * so please ignore the implementation as it is just a random piece of code
+       * the feelsLikeOutside method below is a static implementation assuming all temperature units are the same
+       * so please ignore the implementation, as it is just a random piece of code
        */
       def feelsLikeOutside(threshold: Type.WeatherThreshold): String = {
         val orderedThreshold = ListMap(threshold.toSeq.sortWith(_._1 < _._1): _*)
