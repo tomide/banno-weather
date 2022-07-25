@@ -10,12 +10,17 @@ object BannoWeatherDataOps {
   implicit class BannoWeatherAppResponseOps(val data: WeatherData) {
 
     private def currentWeatherCondition: String = data.current.weather.headOption.getOrElse(
-      TemperatureInfo("current weather condition is unknown")
+      TemperatureInfo("the current weather condition in this location is unknown")
     ).main
 
     private def alert: Seq[WeatherAlert] = data.alerts.fold(Seq[WeatherAlert]().empty)(alt => alt)
 
     def toBannoWeatherAppResponse(threshold: Type.WeatherThreshold): BannoWeatherAppResponse = {
+
+      /**
+       * the feelsLikeOutside method below is a static implementation assuming all units have the same time range.
+       * so please ignore the implementation as it is just a random piece of code
+       */
       def feelsLikeOutside(threshold: Type.WeatherThreshold): String = {
         val orderedThreshold = ListMap(threshold.toSeq.sortWith(_._1 < _._1): _*)
         orderedThreshold.reduce { (a, b) =>
