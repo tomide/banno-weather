@@ -11,7 +11,12 @@ object Type {
 case class ServerConfig(host: String, port: Int)
 case class BlazeClientConfig(connectionTimeout: Duration, requestTimeout: Duration)
 case class OpenWeatherConfig(apiKey: String, host: Uri, defaultMetric: String, WeatherThreshold: Map[String, Long])
-case class Config(openWeatherConfig: OpenWeatherConfig, serverConfig: ServerConfig, blazeClientConfig: BlazeClientConfig)
+
+case class Config(
+  openWeatherConfig: OpenWeatherConfig,
+  serverConfig: ServerConfig,
+  blazeClientConfig: BlazeClientConfig,
+)
 
 object Config {
   import pureconfig.generic.auto._

@@ -24,13 +24,13 @@ object Launcher extends IOApp {
       for {
         implicit0(logger: StructuredLogger[IO]) <- Resource.eval(Slf4jLogger.fromName[IO]("banno"))
 
-        config                                  <- Resource.eval(IO.fromEither(ConfigSource.default.load[Config].leftMap(e =>
-                                                     new Throwable(ConfigReaderException(e))
-                                                   )))
-        http                                    <- BlazeClientBuilder[IO](ExecutionContext.global)
-          .withConnectTimeout(config.blazeClientConfig.connectionTimeout)
-          .withRequestTimeout(config.blazeClientConfig.requestTimeout)
-          .resource
+        config <- Resource.eval(IO.fromEither(ConfigSource.default.load[Config].leftMap(e =>
+                    new Throwable(ConfigReaderException(e))
+                  )))
+        http   <- BlazeClientBuilder[IO](ExecutionContext.global)
+                    .withConnectTimeout(config.blazeClientConfig.connectionTimeout)
+                    .withRequestTimeout(config.blazeClientConfig.requestTimeout)
+                    .resource
 
       } yield (logger, http, config)
 

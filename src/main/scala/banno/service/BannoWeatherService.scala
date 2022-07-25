@@ -20,11 +20,11 @@ object BannoWeatherService {
     override def retrieveWeatherData(coordinate: Coordinate, weatherUnit: WeatherUnit): F[BannoWeatherAppResponse] = {
       for {
         d <- owc.getWeatherInformation(coordinate, weatherUnit)
-        c = d.map(_.toBannoWeatherAppResponse(config.WeatherThreshold))
+        c  = d.map(_.toBannoWeatherAppResponse(config.WeatherThreshold))
         f <- c match {
-          case Right(v) => v.pure[F]
-          case Left(_) => Sync[F].raiseError(errors.AppError("testing error", IllegalInput))
-        }
+               case Right(v) => v.pure[F]
+               case Left(_)  => Sync[F].raiseError(errors.AppError("testing error", IllegalInput))
+             }
       } yield f
     }
   }
