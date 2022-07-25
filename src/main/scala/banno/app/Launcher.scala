@@ -23,25 +23,26 @@ object Launcher extends IOApp {
     val resource: Resource[IO, (SelfAwareStructuredLogger[IO], Client[IO], Config)] =
       for {
         implicit0(logger: StructuredLogger[IO]) <- Resource.eval(Slf4jLogger.fromName[IO]("banno"))
-        http                                    <- BlazeClientBuilder[IO](ExecutionContext.global)
-                                                     .withConnectTimeout(20.second)
-                                                     .withRequestTimeout(20.second)
-                                                     .resource
+
         config                                  <- Resource.eval(IO.fromEither(ConfigSource.default.load[Config].leftMap(e =>
                                                      new Throwable(ConfigReaderException(e))
                                                    )))
+        http                                    <- BlazeClientBuilder[IO](ExecutionContext.global)
+          .withConnectTimeout(config.blazeClientConfig.connectionTimeout)
+          .withRequestTimeout(config.blazeClientConfig.requestTimeout)
+          .resource
 
       } yield (logger, http, config)
 
     resource.use { case (l, h, c) =>
       implicit val logger: Logger[IO] = l
       val openWeatherClient           = new OpenWeatherClient[IO](c.openWeatherConfig, h)
-      val bannoWeatherService         = new BannoWeatherService.Impl[IO](openWeatherClient)
+      val bannoWeatherService         = new BannoWeatherService.Impl[IO](openWeatherClient, c.openWeatherConfig)
       val route                       = new BannoWeatherRoute[IO](bannoWeatherService, c.openWeatherConfig)
       val routeService                = MiddleWare[IO](route.apply)
       BlazeServerBuilder[IO]
         .withoutBanner
-        .bindHttp(8080, "0.0.0.0")
+        .bindHttp(c.serverConfig.port, c.serverConfig.host)
         .withHttpApp(routeService)
         .withNio2(false)
         .serve

@@ -3,9 +3,15 @@ package banno.app
 import org.http4s.Uri
 import pureconfig.ConfigReader
 
-case class WeatherThreshold(veryHot: Long, hot: Long, cool: Long, cold: Long, extremeCold: Long)
-case class OpenWeatherConfig(apiKey: String, host: Uri, defaultMetric: String, weatherThreshold: WeatherThreshold)
-case class Config(openWeatherConfig: OpenWeatherConfig)
+import scala.concurrent.duration.Duration
+
+object Type {
+  type WeatherThreshold = Map[String, Long]
+}
+case class ServerConfig(host: String, port: Int)
+case class BlazeClientConfig(connectionTimeout: Duration, requestTimeout: Duration)
+case class OpenWeatherConfig(apiKey: String, host: Uri, defaultMetric: String, WeatherThreshold: Map[String, Long])
+case class Config(openWeatherConfig: OpenWeatherConfig, serverConfig: ServerConfig, blazeClientConfig: BlazeClientConfig)
 
 object Config {
   import pureconfig.generic.auto._

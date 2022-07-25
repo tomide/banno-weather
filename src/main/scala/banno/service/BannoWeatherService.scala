@@ -1,18 +1,9 @@
 package banno.service
 
+import banno.app.{OpenWeatherConfig, Type, errors}
 import banno.app.errors.ErrorType.IllegalInput
-import banno.app.errors
-import banno.app.errors.AppError
 import banno.client.OpenWeatherClient
-import banno.model.{
-  BannoWeatherAppResponse,
-  Coordinate,
-  OpenWeatherError,
-  TemperatureInfo,
-  WeatherAlert,
-  WeatherData,
-  WeatherUnit,
-}
+import banno.model.{BannoWeatherAppResponse, Coordinate, WeatherUnit}
 import banno.service.BannoWeatherDataOps.BannoWeatherAppResponseOps
 import cats.effect.Sync
 import cats.implicits._
@@ -24,16 +15,17 @@ trait BannoWeatherService[F[_]] {
 
 object BannoWeatherService {
 
-  class Impl[F[_]: Sync: Logger](owc: OpenWeatherClient[F]) extends BannoWeatherService[F] {
+  class Impl[F[_]: Sync: Logger](owc: OpenWeatherClient[F], config: OpenWeatherConfig) extends BannoWeatherService[F] {
 
-    override def retrieveWeatherData(coordinate: Coordinate, weatherUnit: WeatherUnit): F[BannoWeatherAppResponse] =
+    override def retrieveWeatherData(coordinate: Coordinate, weatherUnit: WeatherUnit): F[BannoWeatherAppResponse] = {
       for {
         d <- owc.getWeatherInformation(coordinate, weatherUnit)
-        c  = d.map(_.toBannoWeatherAppResponse)
+        c = d.map(_.toBannoWeatherAppResponse(config.WeatherThreshold))
         f <- c match {
-               case Right(v) => v.pure[F]
-               case Left(_)  => Sync[F].raiseError(errors.AppError("testing error", IllegalInput))
-             }
+          case Right(v) => v.pure[F]
+          case Left(_) => Sync[F].raiseError(errors.AppError("testing error", IllegalInput))
+        }
       } yield f
+    }
   }
 }
