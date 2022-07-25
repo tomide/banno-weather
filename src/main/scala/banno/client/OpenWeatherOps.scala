@@ -7,6 +7,7 @@ import banno.model.{OpenWeatherError, WeatherData}
 object OpenWeatherOps {
 
   implicit class OpenWeatherErrorResponseOps(val error: OpenWeatherError) {
+
     def toAppError: AppError = {
       error.code match {
         case c if c == 400 => AppError("bad request", IllegalInput)
